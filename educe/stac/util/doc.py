@@ -194,7 +194,16 @@ def narrow_to_span(doc, span):
     doc2.schemas = slice_annos(doc.schemas)
     doc2.relations = slice_annos(doc.relations)
     doc2 = shift_annotations(doc2, offset)
-    evil_set_text(doc2, doc.text()[span.char_start:span.char_end])
+
+    text = doc.text()[span.char_start:span.char_end]
+
+    # MH: add the missing space that we should have at the end of
+    #     an .ac file (as a convetion)
+    if len(text) != 0:
+        if not text[-1]== ' ':
+            text = text + ' '
+
+    evil_set_text(doc2, text)
     return doc2
 
 
@@ -372,12 +381,20 @@ def move_portion(renames, src_doc, tgt_doc,
                         shift_annotations(snipped, len(prefix_text)))
 
     if tgt_split >= 0:
-        new_tgt_doc = shift_annotations(tgt_doc, len(middle_text),
+        new_tgt_doc = shift_annotations(tgt_doc, len(middle_text)-1,
                                         point=tgt_split)
+        evil_set_text(middle, middle.text()[0:-1])
+        middle_text = middle.text()
     else:
         new_tgt_doc = copy.deepcopy(tgt_doc)
     _set_doc_parts(new_tgt_doc, [new_tgt_doc, middle])
-    evil_set_text(new_tgt_doc, prefix_text + middle_text + suffix_text)
+
+    #MH: Preventing an extra space at the end of .ac file.
+    #    we already got one at the end of 'middle_text'
+    if (suffix_text==' '):
+        evil_set_text(new_tgt_doc, prefix_text + middle_text)
+    else:
+        evil_set_text(new_tgt_doc, prefix_text + middle_text + suffix_text)
 
     return new_src_doc, new_tgt_doc
 
