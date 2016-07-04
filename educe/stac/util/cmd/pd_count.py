@@ -333,7 +333,7 @@ def create_dfs(corpus):
     res = {anno_type: pd.DataFrame(data=row_list)
            for anno_type, row_list in rows.items()
            if row_list}
-
+    #print(res)
     return res
 
 
@@ -352,12 +352,12 @@ def report_on_corpus(corpus):
     edus = dfs['edu']
     dialogues = dfs['dialogue']
     # annotation
-    if 'rels' in dfs:
+    if 'rel' in dfs:
         rels = dfs['rel']
         disc_rels = rels[rels['stage'] == 'discourse']
     else:
         disc_rels = pd.DataFrame()
-    # pd.util.testing.assert_frame_equal(rels, disc_rels)
+    #pd.util.testing.assert_frame_equal(rels, disc_rels)
     # FIXME this assertion fails for TEST: a document has
     # an "Elaboration" relation in units/SILVER (!?) ; this is
     # probably an error from the annotation process
